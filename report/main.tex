@@ -1,0 +1,95 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% ── Packages ──────────────────────────────────────────────────────────
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{balance}  % balance columns on last page
+
+% ── Macros ────────────────────────────────────────────────────────────
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Graphics path
+\graphicspath{{./figures/}}
+
+% ── Document ──────────────────────────────────────────────────────────
+\begin{document}
+
+\title{Prompt Injection and Tool-use Attacks in LLM Applications: A Survey}
+
+% ── Authors (5 members) ──────────────────────────────────────────────
+\author{
+\IEEEauthorblockN{Yu Peihan}
+\IEEEauthorblockA{Dept. of Computer Science \\
+City University of Hong Kong (Dongguan) \\
+ID: 72510479 \\
+YuFishYPH@gmail.com}
+\and
+\IEEEauthorblockN{Hu Xuelin}
+\IEEEauthorblockA{Dept. of Computer Science \\
+City University of Hong Kong (Dongguan) \\
+ID: 72510295 \\
+72510295@cityu-dg.edu.cn}
+\and
+\IEEEauthorblockN{Weng Ziyan}
+\IEEEauthorblockA{Dept. of Computer Science \\
+City University of Hong Kong (Dongguan) \\
+ID: 72510283 \\
+72510283@cityu-dg.edu.cn}
+\and
+\IEEEauthorblockN{Deng Leying}
+\IEEEauthorblockA{Dept. of Computer Science \\
+City University of Hong Kong (Dongguan) \\
+ID: 72512227 \\
+72512227@cityu-dg.edu.cn}
+\and
+\IEEEauthorblockN{Zhao Haichao}
+\IEEEauthorblockA{Dept. of Computer Science \\
+City University of Hong Kong (Dongguan) \\
+ID: 72515790 \\
+72515790@cityu-dg.edu.cn}
+}
+
+\maketitle
+
+% ── Abstract ──────────────────────────────────────────────────────────
+\begin{abstract}
+Large Language Models (LLMs) are increasingly deployed in applications that
+process untrusted inputs and invoke external tools, creating new attack surfaces.
+This survey systematically examines prompt injection attacks---both direct and
+indirect---as well as tool-use exploitation in LLM-integrated systems. We
+propose a unified taxonomy covering three attack families (direct prompt
+injection, indirect prompt injection, and tool-use/agent exploitation) and four
+defense categories (input sanitization, instruction hierarchy, output
+monitoring, and architectural isolation). Through critical analysis of recent
+literature, we compare threat model assumptions, evaluation methodologies, and
+the practical deployability of proposed defenses. Our findings reveal that
+current defenses remain largely reactive and brittle, and we identify key open
+problems including the absence of standardized benchmarks and the fundamental
+tension between model capability and security.
+\end{abstract}
+
+% ── Section files ─────────────────────────────────────────────────────
+\input{sections/introduction}
+\input{sections/background}
+\input{sections/analysis_attacks}
+\input{sections/analysis_defenses}
+\input{sections/analysis_comparison}
+\input{sections/discussion}
+\input{sections/conclusion}
+\input{sections/ai_statement}
+
+% ── References ────────────────────────────────────────────────────────
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

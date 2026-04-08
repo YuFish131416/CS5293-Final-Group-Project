@@ -1,0 +1,28 @@
+% ── Section 2: Background ────────────────────────────────────────────
+\section{Background}
+\label{sec:bg}
+
+\subsection{Large Language Models and Prompt-Based Interaction}
+
+Modern LLMs such as GPT-4~\cite{achiam2023gpt4} are autoregressive transformer networks trained on broad internet corpora. At inference time they accept a token sequence and produce a continuation; the ``prompt'' is simply the prefix that steers this continuation. In practice, commercial LLM APIs expose a \emph{multi-role message format}: a \texttt{system} message sets the application's persona and policy, followed by alternating \texttt{user} and \texttt{assistant} messages that carry the conversation. Crucially, all three roles are serialized into a single token stream before the model processes them---meaning the separation between instructions and data exists only by convention, not by any cryptographic or type-level guarantee~\cite{liu2024prompt}. This conflation is the root cause of prompt injection.
+
+The same architecture enables powerful \emph{in-context learning}: by including examples or detailed instructions in the system prompt, developers can customize an LLM's behaviour without retraining. But this flexibility also means that a sufficiently persuasive string in the user or data field can redirect the model just as effectively as the system prompt.
+
+\subsection{Tool-Augmented LLM Applications}
+
+A significant trend since 2023 is augmenting LLMs with the ability to call external tools. The prevailing design pattern interleaves ``thought'' and ``action'' steps: the model reasons about a query and then invokes a function (web search, code execution, database query, email send, etc.) before observing the result~\cite{ruan2024toolemu}. Commercial systems like ChatGPT Plugins and LangChain agents follow this pattern. Retrieval-Augmented Generation (RAG) is a special case: the model's ``tool'' is a vector-search index over documents, and the retrieved text is concatenated into the prompt as context.
+
+Tool augmentation dramatically expands the attack surface. Without tools, a compromised LLM can only produce misleading text. With tools, it can read and write files, send messages, execute code, or interact with third-party APIs on the user's behalf. The damage ceiling thus shifts from information manipulation to \emph{autonomous action in the real world}~\cite{ruan2024toolemu}. Ruan et al.\ found that even well-known commercial models triggered unsafe tool calls in 23.9\% of their emulated test scenarios, highlighting the practical risk.
+
+\subsection{Threat Model}
+\label{sec:threat}
+
+We define three attacker profiles, each corresponding to one attack family:
+
+\textbf{Direct injection adversary.} The attacker has access to the user-input field and crafts a prompt intended to override the system instructions. This is the simplest threat model: the attacker interacts with the LLM through its normal interface. Examples include ``Ignore all previous instructions'' prefixes and role-playing exploits~\cite{perez2022hackaprompt}.
+
+\textbf{Indirect injection adversary.} The attacker does not interact with the LLM directly. Instead, the attacker plants malicious payloads in data sources that the LLM will retrieve---web pages, email bodies, shared documents, or database records~\cite{greshake2023indirect}. The user, who triggers the retrieval, is typically unaware of the embedded instructions. This model is more realistic for production RAG systems and web-browsing agents.
+
+\textbf{Tool-use adversary.} This attacker targets the LLM's ability to invoke tools. Through either direct or indirect injection, the goal is to cause the model to call a tool with attacker-chosen parameters---for instance, exfiltrating conversation history via an API call or writing malicious files~\cite{zhan2024injecagent}. The attacker may also chain multiple tool calls to achieve a complex objective that no single injection could accomplish.
+
+On the defender side, we assume the system operator controls the system prompt and the set of available tools, but cannot modify the LLM weights (unless explicitly stated, as in training-time defenses). The operator may add pre- or post-processing layers around the model. End users are assumed non-adversarial but their data environment may be compromised.

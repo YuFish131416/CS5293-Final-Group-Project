@@ -1,0 +1,31 @@
+% ── Section 3: Attack Taxonomy ───────────────────────────────────────
+\section{Attack Taxonomy}
+\label{sec:attacks}
+
+We organize known attacks into three families based on the adversary's access vector. While the families overlap---an indirect injection can trigger tool-use exploitation---the distinction clarifies the threat model assumptions each attack requires.
+
+\subsection{Direct Prompt Injection}
+
+Direct injection is the oldest and most studied form. The attacker types a carefully crafted input into the user field of an LLM application, hoping the model will follow the injected instruction instead of the developer's system prompt.
+
+Schulhoff et al.\ ran the HackAPrompt competition, collecting over 600{,}000 adversarial prompts from 2{,}800 participants targeting three LLMs (GPT-3, GPT-3.5, and FlanT5-XXL)~\cite{perez2022hackaprompt}. The competition revealed recurring bypass patterns: \emph{instruction override} (``Ignore previous instructions and\dots''), \emph{context switching} (``\textbackslash n\textbackslash nSystem: New instructions follow\dots''), and \emph{payload splitting} (distributing the malicious instruction across multiple turns to evade single-turn filters). A striking finding was that GPT-3.5 exhibited higher susceptibility to context-switching attacks than GPT-3, suggesting that instruction-following capability and injection vulnerability may be positively correlated.
+
+Toyer et al.\ took a different evaluation approach with Tensor Trust, a two-player online game where one player writes a ``defense prompt'' and the other attempts to extract a secret passphrase through injection~\cite{toyer2024tensor}. Over 126{,}000 attack and 46{,}000 defense prompts were collected, forming a large adversarial dataset. Their analysis showed that simple keyword-based defenses were consistently defeated, whereas longer, more specific system prompts improved robustness moderately but never achieved full immunity.
+
+Liu et al.\ proposed a systematic taxonomy that divides direct injection techniques into goal hijacking (redirecting the model's task), prompt leaking (extracting the system prompt), and unsafe content generation~\cite{liu2024prompt}. Their framework is useful for organizing the attack surface, though the boundaries between categories can blur in practice---a single injection string often achieves multiple goals simultaneously.
+
+\subsection{Indirect Prompt Injection}
+
+Indirect injection is more dangerous than its direct counterpart because the victim user may have no visibility into the malicious payload. Greshake et al.\ were the first to demonstrate this threat in real-world systems~\cite{greshake2023indirect}. They embedded hidden instructions in web pages that Bing Chat would retrieve during search-augmented conversations. In one scenario, the injected payload caused the chatbot to produce a phishing link while appearing to answer the user's legitimate question. They also showed that invisible Unicode characters and CSS-hidden text could carry payloads that pass human inspection of the source page.
+
+Yi et al.\ created the BIPIA (Benchmarking Indirect Prompt Injection Attacks) framework to enable controlled evaluation~\cite{yi2023bipia}. BIPIA constructs injection scenarios across five domains---email, web content, table data, code review, and summarization---and tests whether injected instructions in the retrieved context can redirect the model's output. On GPT-4, the baseline attack success rate (without any defense) exceeded 70\% for email-based injections. Interestingly, GPT-4 was more susceptible than GPT-3.5 in certain BIPIA categories, again highlighting the troubling link between capability and exploitability.
+
+Pedro et al.\ extended the analogy between prompt injection and traditional web vulnerabilities by demonstrating how LLM-integrated web applications can be exploited to perform SQL injection indirectly~\cite{pedro2023prompt}. Their work showed that an attacker could craft a natural-language prompt that causes the LLM to generate a malicious SQL query, effectively using the model as a relay to attack a backend database. This ``prompt-to-SQL'' pipeline illustrates how injection threats compose across system layers.
+
+\subsection{Tool-use and Agent Exploitation}
+
+When an LLM has access to tools, a successful injection gains leverage far beyond text generation. Zhan et al.\ introduced InjecAgent, the first benchmark specifically designed for this setting~\cite{zhan2024injecagent}. They constructed 1{,}054 test cases spanning 17 user tools (email, calendar, file manager, etc.) and two attack types: \emph{direct harm}, where the injected instruction causes a single dangerous tool call, and \emph{data stealing}, where the agent is tricked into exfiltrating sensitive information to an attacker-controlled endpoint. On GPT-4, direct-harm attacks succeeded 24\% of the time even without specialized prompt optimization, and the data-stealing variant reached 16\% success.
+
+Ruan et al.\ approached the tool-use risk from an evaluation standpoint with ToolEmu~\cite{ruan2024toolemu}. Because running real tool actions (deleting files, sending emails) during safety testing is unacceptable, they proposed an LLM-emulated sandbox where a separate model simulates tool execution and returns plausible outputs. Using this framework with 144 evaluation scenarios spanning 36 tools, they found that GPT-4-based agents triggered at least one ``irreversible and severe'' unsafe action in 23.9\% of scenarios. While the emulation introduces a fidelity gap---the simulated tool may not behave identically to the real one---ToolEmu remains the most practical way to stress-test agent safety at scale without causing actual damage.
+
+Debenedetti et al.\ developed AgentDojo as a dynamic evaluation environment that goes beyond static test cases~\cite{debenedetti2024agentdojo}. Rather than testing individual injections in isolation, AgentDojo evaluates how well an agent can complete legitimate user tasks while resisting injection attempts embedded in the environment. Their finding that even the best-performing agents sacrifice significant utility when injection defenses are activated points to a persistent tension between security and functionality that we revisit in Section~\ref{sec:discussion}.

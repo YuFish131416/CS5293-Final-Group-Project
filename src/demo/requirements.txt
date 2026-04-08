@@ -1,0 +1,6 @@
+# Prompt Injection Demo — Dependencies
+# =====================================
+# The demo runs in simulated mode with zero dependencies.
+# Install these only if you want to use --live mode with a real LLM API.
+
+openai>=1.0.0      # OpenAI Python client (also works with compatible APIs)

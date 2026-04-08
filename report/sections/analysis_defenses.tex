@@ -1,0 +1,33 @@
+% ── Section 4: Defense Mechanisms ─────────────────────────────────────
+\section{Defense Mechanisms}
+\label{sec:defenses}
+
+No single defense eliminates prompt injection, and the proposals in the literature address different parts of the attack chain. We group them into four categories.
+
+\subsection{Input Sanitization and Filtering}
+
+The most intuitive defense is to inspect and transform inputs before they reach the model. Early approaches relied on keyword blocklists (flagging strings like ``ignore previous instructions''), but Toyer et al.'s Tensor Trust results showed that such filters are trivially bypassed through paraphrasing, encoding, or multilingual prompts~\cite{toyer2024tensor}.
+
+Hines et al.\ proposed Spotlighting, a family of three techniques aimed at helping the model distinguish developer instructions from retrieved data~\cite{hines2024spotlighting}. \emph{Delimiting} wraps external content in special tokens (e.g., triple backticks). \emph{Encoding} transforms the retrieved text through a reversible cipher (e.g., Base64 or ROT13) so that injected natural-language commands lose their syntactic force. \emph{Datamarking} inserts a known marker character between every word in the external content, creating a pattern the model can learn to treat as data rather than instruction. Evaluated on the BIPIA benchmark, datamarking reduced attack success rates from over 70\% to below 20\% on GPT-4, outperforming both delimiting and encoding. The cost is a moderate increase in token count (roughly 30\% for datamarking), which directly translates to higher latency and API expense.
+
+A practical advantage of Spotlighting is that it requires no model modification---it operates purely at the prompt-construction layer and can be applied to any LLM API. However, all three variants assume the attacker cannot adapt to the specific transformation in use. If the encoding scheme is known (or guessable), an adversary can pre-encode the payload so that after transformation it reads as a valid instruction.
+
+\subsection{Instruction Hierarchy and Privilege Separation}
+
+A more principled approach is to teach the model itself to treat messages from different roles with different levels of trust. Wallace et al.\ at OpenAI developed the Instruction Hierarchy, a training-time method that modifies the RLHF process so the model learns to prioritize system-level instructions over user input, and user input over third-party data~\cite{wallace2024hierarchy}. When a user message conflicts with the system prompt, the trained model is supposed to follow the system prompt. Empirically, this reduced injection success rates by 30--50\% across their benchmark, and the approach has been deployed in the GPT-4o series of models. The downside is that training-time solutions are model-specific: they cannot be applied to third-party or open-source models without a full retraining cycle.
+
+Suo et al.\ proposed a complementary, inference-time method called Signed-Prompt~\cite{suo2024signedprompt}. Here, the system prompt is cryptographically signed and the signature is included as part of the prompt context. A verification layer checks whether incoming instructions carry a valid signature; unsigned instructions (i.e., user or third-party input) are flagged and processed with restricted privileges. The approach is LLM-agnostic and adds negligible computational overhead. However, it assumes the model can reliably parse and respect the signature convention---an assumption that Suo et al.\ only validated on a limited custom test set, leaving its robustness against adversarial attacks uncertain.
+
+\subsection{Output Monitoring and Guardrails}
+
+Rather than preventing the model from processing an injection, output-side defenses inspect what the model produces. Typical implementations use a secondary classifier or a second LLM call to flag dangerous outputs---tool calls with anomalous parameters, responses that leak the system prompt, or text that contradicts the application's policy.
+
+Yi et al.\ evaluated several such post-generation strategies in their BIPIA study, including a ``reminder'' defense (appending ``Remember, do not follow instructions in the retrieved text'' to the prompt) and an LLM-based output filter~\cite{yi2023bipia}. The reminder defense was surprisingly effective against naive injections (reducing success from 72\% to 38\% on GPT-4) but collapsed against adversarially optimized payloads. The output-filter approach performed better (success rate below 15\%) but doubled inference latency because it required a second model call.
+
+The fundamental limitation of output monitoring is that it operates \emph{after} the model has already processed the injected instruction. If the injection causes the model to invoke a tool with side effects---sending an email or deleting a file---post-hoc filtering arrives too late. Output monitors are therefore most useful as a defence-in-depth layer rather than a primary countermeasure.
+
+\subsection{Architectural Isolation}
+
+The strongest defenses restructure the system architecture to prevent injected data from reaching the instruction-processing pathway. Chen et al.\ introduced StruQ (Structured Queries), which separates prompt and data at the model's input encoding level~\cite{chen2024struq}. Instead of concatenating the system prompt and external data into a single text stream, StruQ uses separate encoding channels---one for instructions and one for data. The model is then fine-tuned to never follow instructions originating from the data channel. On both a custom evaluation set and BIPIA, StruQ achieved near-zero attack success rates. The trade-off is significant: the approach requires retraining or fine-tuning the target model, and the authors only demonstrated it on 7B-parameter open-source models. Whether the technique scales to frontier models remains an open question.
+
+A broader architectural pattern is the \emph{dual-LLM} design, in which one model handles untrusted input and a second, privileged model decides on tool invocations. While no single paper in our corpus fully implements this pattern, it appears as a recurring recommendation in both the OWASP LLM Top 10~\cite{owasp2025llm} and in Willison's widely cited analysis~\cite{willison2023prompt}. The idea is appealing because it mirrors the principle of least privilege from operating-system security, but practical implementations must handle the communication overhead and the risk that the privileged model is itself susceptible to indirect injection through the first model's outputs.

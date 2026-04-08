@@ -1,0 +1,29 @@
+% ── Section 6: Discussion ────────────────────────────────────────────
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Key Findings}
+
+Three themes emerge from our analysis. First, the root vulnerability---the inability of LLMs to separate instructions from data within a single token stream---is architectural, not incidental. All direct and indirect injection attacks exploit this same conflation, and none of the surveyed defenses eliminate it entirely. StruQ comes closest by introducing separate encoding channels~\cite{chen2024struq}, but it has only been validated on small open-source models. Until mainstream frontier models adopt similar architectural changes, prompt injection will remain an inherent risk rather than a patchable bug.
+
+Second, there is a troubling correlation between model capability and injection vulnerability. Both HackAPrompt~\cite{perez2022hackaprompt} and BIPIA~\cite{yi2023bipia} found that more capable models (GPT-4 vs.\ GPT-3.5) were at least as susceptible to injection---and in some categories more so. This makes intuitive sense: a model that is better at following instructions will also be better at following injected instructions. The Instruction Hierarchy attempts to break this correlation by teaching the model to respect privilege levels~\cite{wallace2024hierarchy}, but their results show a 30--50\% reduction rather than elimination, and the residual attack surface grows as models become more capable.
+
+Third, tool-use magnifies injection impact from an annoyance to a genuine safety hazard. The 23.9\% unsafe-action rate reported by Ruan et al.~\cite{ruan2024toolemu} and the 24\% direct-harm success rate from InjecAgent~\cite{zhan2024injecagent} are alarming given that these tests used state-of-the-art models with basic safety training. As agentic applications expand---auto-executing code, managing files, interacting with financial services---the damage ceiling of a single successful injection rises sharply.
+
+\subsection{Limitations of Current Literature}
+
+The body of work we surveyed has several structural weaknesses. Most obviously, there is no shared benchmark suite. HackAPrompt tests direct injection in a competition format, InjecAgent focuses on tool-use, BIPIA targets indirect injection in text-processing tasks, and AgentDojo evaluates agentic workflows~\cite{perez2022hackaprompt, zhan2024injecagent, yi2023bipia, debenedetti2024agentdojo}. Because each benchmark defines its own metrics and attacker model, aggregating results across studies requires caution. A researcher reporting that ``defense X reduces attack success by 50\%'' may mean something very different depending on which benchmark was used.
+
+Reproducibility is another concern. Papers that evaluate against proprietary API models (GPT-3.5, GPT-4) are effectively testing a moving target: the model weights, safety filters, and system prompt handling change without public notice. Results from early 2024 may already be stale. Only studies that include open-source model evaluations (e.g., StruQ on LLaMA~\cite{chen2024struq}) or provide adversarial datasets for re-evaluation (Tensor Trust~\cite{toyer2024tensor}) allow independent verification.
+
+Finally, the ethical dimension of attack research deserves scrutiny. Publishing detailed injection payloads inevitably dual-uses: it helps defenders understand the threat but also lowers the barrier for malicious actors. The surveyed papers generally handle this responsibly---HackAPrompt ran in a controlled environment, and ToolEmu avoids real tool execution---yet the tension between disclosure and harm is unresolved.
+
+\subsection{Open Problems}
+
+Several directions warrant further investigation. \emph{Formal verification.} Can we define and verify ``prompt safety'' properties analogous to memory safety in programming languages? Current evaluations are empirical; the absence of a formal model means we cannot prove that a defense works against all possible injections.
+
+\emph{Standardized evaluation.} The community would benefit from a unified benchmark that covers all three attack families, controls for attacker strength, and includes both utility and security metrics. AgentDojo~\cite{debenedetti2024agentdojo} is a step in this direction but focuses narrowly on agentic tasks.
+
+\emph{Multi-agent propagation.} As LLM agents increasingly communicate with each other (e.g., one agent delegating tasks to another), injection payloads could propagate across trust boundaries. We are unaware of published work that systematically studies this ``worm-like'' propagation risk, though Greshake et al.\ briefly speculated about it~\cite{greshake2023indirect}.
+
+\emph{Regulatory alignment.} Emerging frameworks such as the OWASP LLM Top 10~\cite{owasp2025llm} have begun cataloguing injection risks, but binding regulatory requirements remain sparse. As LLM applications enter regulated sectors (healthcare, finance, legal), aligning injection defenses with compliance obligations will become a practical necessity.

@@ -1,0 +1,43 @@
+% ── Section 5: Comparative Analysis ──────────────────────────────────
+\section{Comparative Analysis}
+\label{sec:comparison}
+
+Having surveyed attacks and defenses individually, we now compare them along three cross-cutting dimensions.
+
+\subsection{Threat Model Assumptions}
+
+The surveyed papers operate under widely varying assumptions about what the attacker can and cannot do, and this variation makes direct comparison difficult. On the attack side, Greshake et al.\ tested against real production systems (Bing Chat) with realistic attacker capabilities---embedding payloads in publicly accessible web pages~\cite{greshake2023indirect}. Their threat model is arguably the most representative of actual deployment conditions. By contrast, HackAPrompt's competition format grants the attacker direct, iterative access to the prompt interface with full knowledge of the scoring function~\cite{perez2022hackaprompt}, creating an unusually strong adversary that few real-world attackers would resemble.
+
+On the defense side, there is a mirror problem. The Instruction Hierarchy was evaluated against a benchmark where injections appear in well-defined message roles~\cite{wallace2024hierarchy}, while Spotlighting was tested against the BIPIA benchmark where injections are embedded in retrieved text~\cite{hines2024spotlighting}. Because the attack corpora and injection positions differ, comparing their reported success rates directly would be misleading. We believe the field urgently needs a shared evaluation framework---one that controls for attacker strength, injection vector, and application context---to enable fair comparison.
+
+\subsection{Evaluation Methodology}
+
+Three distinct evaluation paradigms appear in the literature. \emph{Benchmark-driven} studies (HackAPrompt, InjecAgent, BIPIA, AgentDojo) use standardized test sets with quantitative success metrics~\cite{perez2022hackaprompt, zhan2024injecagent, yi2023bipia, debenedetti2024agentdojo}. These enable reproducibility and comparison but risk measuring only the specific attack patterns included in the benchmark. \emph{Red-team demonstrations} (Greshake et al., Pedro et al.) test against live or near-live systems and produce compelling evidence of real risk, but their results are hard to generalize or replicate~\cite{greshake2023indirect, pedro2023prompt}. \emph{Simulated environments} (ToolEmu) balance safety and realism by emulating tool execution, though the simulation introduces fidelity concerns~\cite{ruan2024toolemu}.
+
+A separate issue is the volatility of API-based models. Several studies evaluate against proprietary models accessed through APIs, but these models are updated without notice. An injection that works against GPT-4 in January may fail in March, and vice versa. Only papers that evaluate open-source models (e.g., StruQ on LLaMA-7B~\cite{chen2024struq}) provide fully reproducible baselines. We recommend that future work include at least one open-source model in evaluations to ensure long-term reproducibility.
+
+\subsection{Deployment Feasibility}
+
+Table~\ref{tab:deployment} summarizes the practical deployment characteristics of the four defense categories.
+
+\begin{table}[t]
+\centering
+\caption{Defense deployment characteristics.}
+\label{tab:deployment}
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & \textbf{Training} & \textbf{Model-} & \textbf{Overhead} & \textbf{Deployed} \\
+ & \textbf{required?} & \textbf{agnostic?} & & \textbf{in prod?} \\
+\midrule
+Spotlighting~\cite{hines2024spotlighting} & No & Yes & +30\% tokens & No \\
+Signed-Prompt~\cite{suo2024signedprompt} & No & Yes & Minimal & No \\
+Instr.\ Hierarchy~\cite{wallace2024hierarchy} & Yes & No & Minimal & Yes (GPT-4o) \\
+StruQ~\cite{chen2024struq} & Yes & No & Minimal & No \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Only the Instruction Hierarchy has confirmed production deployment, reflecting the advantage of a major model provider integrating the defense directly into the training pipeline. Drop-in solutions like Spotlighting and Signed-Prompt lower the adoption barrier since they work with any LLM API, but their effectiveness depends on the attack remaining unaware of the specific transformation applied. StruQ offers the strongest theoretical guarantees but demands model retraining, which limits its reach to organizations with the resources to fine-tune their own models.
+
+We observe a rough inverse relationship between defense strength and ease of adoption. The approaches that require no model changes (Spotlighting, Signed-Prompt) are the easiest to deploy but the most fragile against adaptive adversaries. Those that modify the model itself (Instruction Hierarchy, StruQ) are harder to deploy but provide more durable protection. In our view, production systems should layer multiple defenses---combining a prompt-level technique (e.g., Spotlighting) with training-time hardening (e.g., Instruction Hierarchy) and an output-monitoring backstop---to achieve defence in depth.
