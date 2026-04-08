@@ -28,14 +28,14 @@
 
 | 章节 | 文件 | 负责人 | 状态 |
 |------|------|--------|:----:|
-| Introduction | introduction.tex | 余佩翰 | ✅ 完整 |
-| Background | background.tex | 胡雪琳 | ✅ 完整 |
-| Attack Taxonomy | analysis_attacks.tex | 翁子言 | ✅ 完整 |
+| Introduction | introduction.tex | 余沛翰 | ✅ 完整 |
+| Background | background.tex | 胡薛林 | ✅ 完整 |
+| Attack Taxonomy | analysis_attacks.tex | 翁梓严 | ✅ 完整 |
 | Defense Mechanisms | analysis_defenses.tex | 邓乐盈 | ✅ 完整 |
 | Comparative Analysis | analysis_comparison.tex | 邓乐盈 | ✅ 完整 |
 | Discussion | discussion.tex | 赵海超 | ✅ 完整 |
-| Conclusion | conclusion.tex | 余佩翰 | ✅ 完整 |
-| AI Use Statement | ai_statement.tex | 余佩翰 | ✅ 已按要求更新 |
+| Conclusion | conclusion.tex | 余沛翰 | ✅ 完整 |
+| AI Use Statement | ai_statement.tex | 余沛翰 | ✅ 已按要求更新 |
 
 ### 2.2 AI Use Statement 核查
 

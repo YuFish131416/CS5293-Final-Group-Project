@@ -2,7 +2,7 @@
 
 > **CS5293 信息安全专题 — 期末小组项目**
 > **Topic 17**: Prompt Injection and Tool-use Attacks in LLM Applications
-> **团队成员**: 余佩翰、胡雪琳、翁子言、邓乐盈、赵海超
+> **团队成员**: 余沛翰、胡薛林、翁梓严、邓乐盈、赵海超
 
 ---
 
@@ -52,14 +52,14 @@ project-root/
 │   ├── references.bib                   ← 参考文献 BibTeX 条目（所有引用都在这里）
 │   ├── figures/                         ← 报告用图片
 │   └── sections/                        ← 各章节独立文件 ⭐ 编辑报告内容在这里
-│       ├── introduction.tex             ← 引言：问题定义、动机、研究范围 【余佩翰】
-│       ├── background.tex               ← 背景：LLM 架构、工具调用、威胁模型 【胡雪琳】
-│       ├── analysis_attacks.tex         ← 攻击分类：直接/间接/工具利用 【翁子言】
+│       ├── introduction.tex             ← 引言：问题定义、动机、研究范围 【余沛翰】
+│       ├── background.tex               ← 背景：LLM 架构、工具调用、威胁模型 【胡薛林】
+│       ├── analysis_attacks.tex         ← 攻击分类：直接/间接/工具利用 【翁梓严】
 │       ├── analysis_defenses.tex        ← 防御机制：过滤/层级/监测/隔离 【邓乐盈】
 │       ├── analysis_comparison.tex      ← 交叉比较：威胁模型/评估方法/部署可行性 【邓乐盈】
 │       ├── discussion.tex               ← 讨论：核心发现、文献局限、开放问题 【赵海超】
-│       ├── conclusion.tex               ← 结论 【余佩翰】
-│       └── ai_statement.tex             ← AI 使用声明 【余佩翰】
+│       ├── conclusion.tex               ← 结论 【余沛翰】
+│       └── ai_statement.tex             ← AI 使用声明 【余沛翰】
 │
 ├── slides/                              ← 🎬 幻灯片
 │   ├── slides.pptx                      ← 最终幻灯片（12张，5分钟演示）
