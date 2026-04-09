@@ -346,11 +346,19 @@ pres.title  = "Prompt Injection & Tool-use Attacks in LLM Applications";
     align: "center", margin: 0
   });
 
-  // Bottom key takeaway
-  s.addText("Key insight: More capable models are MORE susceptible to injection (HackAPrompt, BIPIA)", {
-    x: 0.8, y: 4.7, w: 8.4, h: 0.5,
-    fontSize: 12, fontFace: FONT_BODY, color: C.accent3,
-    italic: true, align: "center", margin: 0
+  // Bottom key takeaway — highlighted card
+  s.addShape(pres.shapes.RECTANGLE, {
+    x: 1.2, y: 4.55, w: 7.6, h: 0.6,
+    fill: { color: "1E293B" },
+    rectRadius: 0.08,
+    line: { color: C.accent3, width: 1.5 }
+  });
+  s.addText([
+    { text: "Key Insight: ", options: { bold: true, color: C.accent3, fontSize: 12 } },
+    { text: "More capable models are MORE susceptible to injection — confirmed by both HackAPrompt and BIPIA benchmarks", options: { color: C.text_light, fontSize: 12 } },
+  ], {
+    x: 1.4, y: 4.55, w: 7.2, h: 0.6,
+    fontFace: FONT_BODY, valign: "middle", margin: 0
   });
 }
 
@@ -426,6 +434,13 @@ pres.title  = "Prompt Injection & Tool-use Attacks in LLM Applications";
   ], {
     x: 5.35, y: 1.9, w: 3.7, h: 2.9,
     fontFace: FONT_BODY, color: C.text_mid, valign: "top", margin: 0
+  });
+
+  // Bottom transition hint
+  s.addText("These attacks share one root cause: LLMs cannot separate instructions from data.  Next: How do we defend?", {
+    x: 0.8, y: 5.2, w: 8.4, h: 0.3,
+    fontSize: 10, fontFace: FONT_BODY, color: C.primary, italic: true,
+    align: "center", margin: 0
   });
 }
 
@@ -871,16 +886,16 @@ pres.title  = "Prompt Injection & Tool-use Attacks in LLM Applications";
     fontSize: 32, fontFace: FONT_TITLE, color: C.text_light, bold: true, margin: 0
   });
 
-  // Three key takeaways
+  // Three key takeaways — compact layout
   const takeaways = [
     {
       num: "1",
-      text: "The root vulnerability is architectural: LLMs cannot separate instructions from data. This is not a bug to patch — it is inherent to the design.",
+      text: "The root vulnerability is architectural: LLMs cannot separate instructions from data — inherent to the design, not a patchable bug.",
       color: C.accent
     },
     {
       num: "2",
-      text: "More capable models are more vulnerable to injection. Instruction-following ability and injection susceptibility are positively correlated.",
+      text: "More capable models are more vulnerable. Instruction-following ability and injection susceptibility are positively correlated.",
       color: C.accent3
     },
     {
@@ -891,40 +906,40 @@ pres.title  = "Prompt Injection & Tool-use Attacks in LLM Applications";
   ];
 
   takeaways.forEach((t, i) => {
-    const yBase = 1.4 + i * 1.05;
+    const yBase = 1.3 + i * 0.9;
 
     s.addShape(pres.shapes.RECTANGLE, {
-      x: 0.8, y: yBase, w: 0.5, h: 0.5,
+      x: 0.8, y: yBase, w: 0.45, h: 0.45,
       fill: { color: t.color }
     });
     s.addText(t.num, {
-      x: 0.8, y: yBase, w: 0.5, h: 0.5,
-      fontSize: 18, fontFace: FONT_BODY, color: "FFFFFF", bold: true,
+      x: 0.8, y: yBase, w: 0.45, h: 0.45,
+      fontSize: 16, fontFace: FONT_BODY, color: "FFFFFF", bold: true,
       align: "center", valign: "middle", margin: 0
     });
 
     s.addText(t.text, {
-      x: 1.5, y: yBase, w: 7.7, h: 0.85,
-      fontSize: 13, fontFace: FONT_BODY, color: C.text_light,
+      x: 1.4, y: yBase, w: 7.8, h: 0.75,
+      fontSize: 12.5, fontFace: FONT_BODY, color: C.text_light,
       valign: "top", margin: 0
     });
   });
 
-  // Q&A section
+  // Q&A section — more prominent
   s.addShape(pres.shapes.LINE, {
-    x: 0.8, y: 4.2, w: 8.4, h: 0,
+    x: 0.8, y: 3.95, w: 8.4, h: 0,
     line: { color: C.muted, width: 0.5 }
   });
 
-  s.addText("Q & A", {
-    x: 0.8, y: 4.3, w: 8.4, h: 0.55,
-    fontSize: 28, fontFace: FONT_TITLE, color: C.primary, bold: true,
+  s.addText("Questions & Answers", {
+    x: 0.8, y: 4.15, w: 8.4, h: 0.65,
+    fontSize: 32, fontFace: FONT_TITLE, color: C.primary, bold: true,
     align: "center", margin: 0
   });
 
   // Footer
   s.addText("CS5293  |  Topic 17  |  Yu Peihan, Hu Xuelin, Weng Ziyan, Deng Leying, Zhao Haichao", {
-    x: 0.8, y: 4.9, w: 8.4, h: 0.25,
+    x: 0.8, y: 4.95, w: 8.4, h: 0.25,
     fontSize: 10, fontFace: FONT_BODY, color: C.muted,
     align: "center", margin: 0
   });
